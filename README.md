@@ -1,49 +1,83 @@
-class HashNode:
+# Syntaxkontroll
 
-   def __init__(self, key = "", data = None):
-      self.key = key
-      self.data = data
+from linkedQFile import LinkedQ
 
 
-class Hashtable:
+class Syntaxfel(Exception):
+    pass
 
-   def __init__(self, size):
-      self.size = size
-      self.tabell = [None] * size
+def Group(ordkö):
+    Atom(ordkö)
+    if not ordkö.isEmpty():
+        if ordkö.peek().isdigit():
+            num(ordkö)
 
-   def store(self, key, data):
-      value = self.hashfunction(key)
+def Atom(ordkö):
+    LETTER(ordkö)
 
-      for i in range(self.size):
-         nod = self.tabell[value]
+    if not ordkö.isEmpty():
+        if ordkö.peek().islower():
+            letter(ordkö)
 
-         if nod == None:
-            self.tabell[value] = HashNode(key, data)
-            return
-         if nod.key == key:
-            nod.data = data
-            return
+def LETTER(ordkö):
+    ordet = ordkö.peek()
 
-         value = (value + 1) % self.size
+    if not ordet.isupper():
+        raise Syntaxfel("Saknad stor bokstav vid radslutet")
 
-   def search(self, key):
-      value = self.hashfunction(key)
+    ordkö.dequeue()
 
-      for i in range(self.size):
-         nod = self.tabell[value]
+def letter(ordkö):
+    ordet = ordkö.dequeue()
 
-         while nod is not None:
-            nod = self.tabell[value]
-            if nod.key == key:
-               return nod.data
-            
-            value = (value + 1) % self.size
-
-         raise KeyError(key)
-
-   def hashfunction(self, key):
-      resultat = 0
-      for c in key:
-          resultat = (resultat*32 + ord(c)) % self.size
-      return resultat
+    if not ordet.islower():
+        raise Syntaxfel("Saknad liten bokstav vid radslutet")
     
+def num(ordkö):
+    ordet = ordkö.dequeue()
+
+
+    if ordet == "0":
+        raise Syntaxfel("För litet tal vid radslutet")
+    if ordet == "1":
+            if ordkö.isEmpty():
+                raise Syntaxfel("För litet tal vid radslutet")
+    
+    while not ordkö.isEmpty() and ordkö.peek().isdigit():
+        ordkö.dequeue()
+    
+def molekyl(mening):
+    ordkö = LinkedQ()
+    for tecken in mening:
+        ordkö.enqueue(tecken)
+    return ordkö
+
+def sträng(ordkö): 
+    rest = ""
+
+    while not ordkö.isEmpty():
+        rest += ordkö.dequeue()
+
+    return rest
+
+def main(): 
+
+    while True:
+        mening = input()
+        ordkö = molekyl(mening)
+        if mening == "#":
+            break
+        try: 
+            Group(ordkö)
+            print("Formeln är syntaktiskt korrekt")
+
+        except Syntaxfel as fel:
+            rest = sträng(ordkö)
+
+            if rest:
+                print(str(fel) + " " + rest)
+            else: 
+                print(fel)
+
+if __name__ == "__main__":
+    main()
