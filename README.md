@@ -8,8 +8,6 @@ B = [2,3,4,5]
 N = [0,1]
 A2 = np.array((np.eye(4)))
 
-it = 0 
-
 while True:
     
     x_B = np.linalg.solve(A2, b)
@@ -17,24 +15,20 @@ while True:
     y = np.linalg.solve(A2.T, c[B])
     r_N = c[N] - A1.T @ y
 
-    print("Detta är xB", x_B)
-    print("Detta är z", z)
-    print("Detta är y", y)
-    print("Detta är r_N", r_N)
+    print(x_B)
+    print(z)
+    print(y)
+    print(r_N)
 
     if np.all(r_N >= -1e-10):
         break
-    
-    if it == 0:
-        kindex = 0
-    else:
-        kindex = np.argmin(r_N)
-    
+
+    kindex = np.argmin(r_N)
     k = N[kindex]
 
     d = np.linalg.solve(A2, A1[:, kindex])
     
-    tmax = []
+    tmax = [] 
     index = []
     for i in range(4):
         if d[i] > 0:
@@ -50,7 +44,5 @@ while True:
     A1[:, kindex] = temp_col
 
     B[lindex], N[kindex] = k, l
-
-    it += 1 
 
 
